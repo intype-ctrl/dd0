@@ -5,34 +5,41 @@ workflows:
       xcode: latest
       groups:
         - app_store_credentials
-      vars:
+      vars:                       # ← 여기에만 커스텀 변수 선언!
         BUNDLE_ID: "com.ver1.gdn0"
-      XCODE_WORKSPACE: "Runner.xcworkspace"
-      XCODE_SCHEME: "Runner"   # ← 여기 이름이 실제 스킴과 같아야 함
+        XCODE_SCHEME: "Runner"            # 실제 스킴명(대개 Runner)
+        XCODE_WORKSPACE: "Runner.xcworkspace"
+        # XCODE_PROJECT: "Runner.xcodeproj"  # 워크스페이스 쓴다면 이건 빼기
     scripts:
       - name: Set up signing
-        script: | 
+        script: |
           keychain initialize
-          # Decode and install certificate
-          echo $CM_CERTIFICATE | base64 --decode > /tmp/certificate.p12
-          keychain add-certificates --certificate /tmp/certificate.p12 --certificate-password $CERTIFICATE_PASSWORD
-          # Decode and install provisioning profile
+          echo "$CM_CERTIFICATE" | base64 --decode > /tmp/certificate.p12
+          keychain add-certificates --certificate /tmp/certificate.p12 --certificate-password "$CERTIFICATE_PASSWORD"
           PROFILES_DIR="$HOME/Library/MobileDevice/Provisioning Profiles"
           mkdir -p "$PROFILES_DIR"
-          echo $CM_PROVISIONING_PROFILE | base64 --decode > "$PROFILES_DIR/$(uuidgen).mobileprovision"
-      - name: Set up code signing settings
-        script: | 
-          xcode-project use-profiles
+          echo "$CM_PROVISIONING_PROFILE" | base64 --decode > "$PROFILES_DIR/$(uuidgen).mobileprovision"
+
+      - name: Set up code signing settings (manual)
+        script: |
+          xcode-project use-profiles --force
+
       - name: Build ipa for App Store
-        script: | 
-          xcode-project build-ipa --project "$XCODE_PROJECT" --scheme "$XCODE_SCHEME"
+        script: |
+          # 워크스페이스 빌드
+          xcode-project build-ipa \
+            --workspace "$XCODE_WORKSPACE" \
+            --scheme "$XCODE_SCHEME" \
+            --export-method "app-store"
+
     artifacts:
       - build/ios/ipa/*.ipa
       - $HOME/Library/Developer/Xcode/DerivedData/**/Build/**/*.app
       - $HOME/Library/Developer/Xcode/DerivedData/**/Build/**/*.dSYM
-      - /tmp/xcodebuild_logs/*.log 
+      - /tmp/xcodebuild_logs/*.log
     publishing:
       app_store_connect:
         api_key: $APP_STORE_CONNECT_PRIVATE_KEY
         key_id: $APP_STORE_CONNECT_KEY_IDENTIFIER
         issuer_id: $APP_STORE_CONNECT_ISSUER_ID
+        submit_to_testflight: true
