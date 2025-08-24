@@ -5,28 +5,33 @@ workflows:
       xcode: latest
       groups:
         - app_store_credentials
-      vars:                       # ← 여기에만 커스텀 변수 선언!
+      vars:
         BUNDLE_ID: "com.ver1.gdn0"
-        XCODE_SCHEME: "Runner"            # 실제 스킴명(대개 Runner)
+        XCODE_SCHEME: "Runner"              # 실제 스킴명(대부분 Runner)
         XCODE_WORKSPACE: "Runner.xcworkspace"
-        # XCODE_PROJECT: "Runner.xcodeproj"  # 워크스페이스 쓴다면 이건 빼기
+        # XCODE_PROJECT: "Runner.xcodeproj"  # 워크스페이스가 아닌 경우에만 사용
     scripts:
       - name: Set up signing
         script: |
           keychain initialize
+          # p12 설치
           echo "$CM_CERTIFICATE" | base64 --decode > /tmp/certificate.p12
           keychain add-certificates --certificate /tmp/certificate.p12 --certificate-password "$CERTIFICATE_PASSWORD"
+          # 프로비저닝 설치
           PROFILES_DIR="$HOME/Library/MobileDevice/Provisioning Profiles"
           mkdir -p "$PROFILES_DIR"
           echo "$CM_PROVISIONING_PROFILE" | base64 --decode > "$PROFILES_DIR/$(uuidgen).mobileprovision"
 
       - name: Set up code signing settings (manual)
         script: |
-          xcode-project use-profiles --force
+          # 워크스페이스 + 스킴을 명시해서 수동서명 매핑
+          xcode-project use-profiles \
+            --workspace "$XCODE_WORKSPACE" \
+            --scheme "$XCODE_SCHEME"
 
       - name: Build ipa for App Store
         script: |
-          # 워크스페이스 빌드
+          # 워크스페이스 빌드 (App Store 배포)
           xcode-project build-ipa \
             --workspace "$XCODE_WORKSPACE" \
             --scheme "$XCODE_SCHEME" \
