@@ -1,12 +1,10 @@
-import 'package:easy_localization/easy_localization.dart';
-import 'package:feather_icons/feather_icons.dart';
+// home_tab.dart 파일 (수정 완료된 전체 코드)
+
 import 'package:flutter/material.dart';
 import 'package:icons_plus/icons_plus.dart';
 import 'package:line_icons/line_icons.dart';
 import 'package:news_app/models/app_settings_model.dart';
 import 'package:news_app/screens/notifications/notifications.dart';
-import 'package:news_app/screens/search/search_view.dart';
-import 'package:news_app/utils/next_screen.dart';
 
 import '../../../components/app_logo.dart';
 import '../../../components/drawer_menu.dart';
@@ -25,21 +23,11 @@ class HomeTab extends StatefulWidget {
 }
 
 class _HomeTabState extends State<HomeTab> with TickerProviderStateMixin {
-  late TabController _tabController;
-  final scaffoldKey = GlobalKey<ScaffoldState>();
-  List<Tab> _categoryTabs = [];
+  late final TabController _tabController = TabController(length: 1, vsync: this);
 
-  @override
-  void initState() {
-    _tabController = TabController(length: widget.settings.homeCategories!.length + 1, initialIndex: 0, vsync: this);
-    _categoryTabs = widget.settings.homeCategories!
-        .map((e) => Tab(
-              text: e.name,
-            ))
-        .toList()
-      ..insert(0, Tab(text: 'explore'.tr()));
-    super.initState();
-  }
+  static const double _minHeight = 85.0;
+  static const double _maxScale = 1.3;
+  double get _maxHeight => _minHeight * _maxScale;
 
   @override
   void dispose() {
@@ -49,73 +37,117 @@ class _HomeTabState extends State<HomeTab> with TickerProviderStateMixin {
 
   @override
   Widget build(BuildContext context) {
-    // super.build(context);
-    return Scaffold( 
-      backgroundColor: Theme.of(context).canvasColor,
-      drawer: Visibility(visible: widget.settings.drawerMenu ?? true, child: CustomDrawer(settings: widget.settings)),
-      key: scaffoldKey,
-      body: NestedScrollView(headerSliverBuilder: (BuildContext context, bool innerBoxIsScrolled) {
-        return <Widget>[
-          SliverAppBar(
-            automaticallyImplyLeading: false,
-            centerTitle: widget.settings.logoAtCenter ?? false,
-            titleSpacing: widget.settings.drawerMenu == true ? 0 : 20,
-            title: const AppLogo(),
-            leading: Visibility(
-              visible: widget.settings.drawerMenu ?? true,
-              child: IconButton(
-                icon: const Icon(EvaIcons.menu_2, size: 28),
-                onPressed: () {
-                  scaffoldKey.currentState!.openDrawer();
-                },
-              ),
-            ),
-            elevation: 1,
-            actions: <Widget>[
-              IconButton(
-                icon: const Icon(FeatherIcons.search, size: 22),
-                onPressed: () => NextScreen.normal(context, const SearchScreen()),
-              ),
-              const SizedBox(width: 3),
-              IconButton(
-                padding: const EdgeInsets.only(right: 8),
-                constraints: const BoxConstraints(),
-                icon: const Icon(
-                  LineIcons.bell,
-                  // size: 22,
-                ),
-                onPressed: () => NextScreen.normal(context, const Notifications()),
-              ),
-            ],
-            pinned: true,
-            floating: true,
-            forceElevated: innerBoxIsScrolled,
-            bottom: TabBar(
-              tabAlignment: TabAlignment.start,
-              labelStyle: Theme.of(context).textTheme.titleLarge?.copyWith(fontWeight: FontWeight.w600, fontSize: 17),
-              controller: _tabController,
-              indicatorSize: TabBarIndicatorSize.label,
-              unselectedLabelColor: Colors.grey, //niceish grey
-              isScrollable: true,
-              indicatorColor: Theme.of(context).primaryColor,
-              tabs: _categoryTabs,
+    // ✅ Scaffold를 제거하고 NestedScrollView를 바로 반환합니다.
+    return NestedScrollView(
+      headerSliverBuilder: (context, innerBoxIsScrolled) => [
+        SliverPersistentHeader(
+          pinned: true,
+          floating: true,
+          delegate: _HeaderDelegate(
+            minExtentHeight: _minHeight,
+            maxExtentHeight: _maxHeight,
+            maxScale: _maxScale,
+            // ✅ 이제 버튼을 누르면 부모 Scaffold의 endDrawer가 열립니다.
+            onOpenEndDrawer: () => Scaffold.of(context).openEndDrawer(),
+            onOpenNotifications: () => Navigator.of(context).push(
+              MaterialPageRoute(builder: (_) => const Notifications()),
             ),
           ),
-        ];
-      }, body: Builder(
-        builder: (BuildContext context) {
-          final ScrollController innerScrollController = PrimaryScrollController.of(context);
-          return TabMedium(
-            sc: innerScrollController,
-            tc: _tabController,
-            homeCategories: widget.settings.homeCategories ?? [],
-            settings: widget.settings,
+        ),
+      ],
+      body: Builder(
+        builder: (context) {
+          final sc = PrimaryScrollController.of(context);
+          return MediaQuery.removePadding(
+            context: context,
+            removeTop: true,
+            child: TabMedium(
+              sc: sc,
+              tc: _tabController,
+              homeCategories: const [],
+              settings: widget.settings,
+            ),
           );
         },
-      )),
+      ),
+    );
+  }
+}
+
+/// SliverPersistentHeader 전용 델리게이트 (변경 없음)
+class _HeaderDelegate extends SliverPersistentHeaderDelegate {
+  _HeaderDelegate({
+    required this.minExtentHeight,
+    required this.maxExtentHeight,
+    required this.maxScale,
+    required this.onOpenEndDrawer,
+    required this.onOpenNotifications,
+  });
+
+  final double minExtentHeight;
+  final double maxExtentHeight;
+  final double maxScale;
+  final VoidCallback onOpenEndDrawer;
+  final VoidCallback onOpenNotifications;
+
+  @override
+  double get minExtent => minExtentHeight;
+
+  @override
+  double get maxExtent => maxExtentHeight;
+
+  @override
+  Widget build(BuildContext context, double shrinkOffset, bool overlapsContent) {
+    final progress = (shrinkOffset / (maxExtent - minExtent)).clamp(0.0, 1.0);
+    final scale = maxScale - (0.3 * progress);
+
+    return Material(
+      elevation: overlapsContent ? 1 : 0,
+      color: Theme.of(context).appBarTheme.backgroundColor ??
+          Theme.of(context).scaffoldBackgroundColor,
+      child: SafeArea(
+        bottom: false,
+        child: Padding(
+          padding: const EdgeInsets.only(left: 16, right: 8, top: 8),
+          child: Stack(
+            children: [
+              Align(
+                alignment: Alignment.topLeft,
+                child: Transform.scale(
+                  scale: scale,
+                  alignment: Alignment.topLeft,
+                  child: const AppLogo(),
+                ),
+              ),
+              Align(
+                alignment: Alignment.topRight,
+                child: Row(
+                  mainAxisSize: MainAxisSize.min,
+                  children: [
+                    IconButton(
+                      padding: const EdgeInsets.only(right: 8),
+                      constraints: const BoxConstraints(),
+                      icon: const Icon(LineIcons.bell),
+                      onPressed: onOpenNotifications,
+                    ),
+                    IconButton(
+                      icon: const Icon(EvaIcons.menu_2, size: 28),
+                      onPressed: onOpenEndDrawer,
+                    ),
+                  ],
+                ),
+              ),
+            ],
+          ),
+        ),
+      ),
     );
   }
 
-  // @override
-  // bool get wantKeepAlive => true;
+  @override
+  bool shouldRebuild(covariant _HeaderDelegate oldDelegate) {
+    return minExtentHeight != oldDelegate.minExtentHeight ||
+        maxExtentHeight != oldDelegate.maxExtentHeight ||
+        maxScale != oldDelegate.maxScale;
+  }
 }

@@ -6,8 +6,6 @@ import 'package:news_app/models/app_settings_model.dart';
 import 'package:news_app/providers/custom_category_articles_provider.dart';
 import 'package:news_app/utils/empty_animation.dart';
 import 'package:news_app/utils/loading_widget.dart';
-import '../../../ads/ad_manager.dart';
-import '../../../ads/native_ad_widget.dart';
 import '../../../components/loading_list_tile.dart';
 
 class CustomCategoryTab extends ConsumerStatefulWidget {
@@ -72,9 +70,7 @@ class _CustomCategoryTabState extends ConsumerState<CustomCategoryTab> {
                         itemCount: articles.length,
                         separatorBuilder: (context, index) => const SizedBox(height: 20),
                         itemBuilder: (BuildContext context, int index) {
-                          if (AdManager.isNativeAdsEnabled(ref) && AdManager.isPostIntervalValid(ref, index)) {
-                            return const NativeAdWidget(isSmallSize: false);
-                          }
+
                           return ArticleTile(article: articles[index]);
                         },
                       ),

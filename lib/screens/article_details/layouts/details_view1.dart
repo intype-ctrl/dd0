@@ -12,8 +12,6 @@ import 'package:news_app/screens/article_details/post_back_button.dart';
 import 'package:news_app/screens/article_details/post_share_button.dart';
 import 'package:news_app/screens/article_details/post_source_button.dart';
 import 'package:news_app/screens/article_details/related_articles.dart';
-import '../../../ads/ad_manager.dart';
-import '../../../ads/banner_ad.dart';
 import '../../../components/html_body.dart';
 import '../../../services/app_service.dart';
 import '../../../utils/custom_cached_image.dart';
@@ -30,13 +28,10 @@ class ArticleDetailsView1 extends ConsumerWidget {
 
   @override
   Widget build(BuildContext context, WidgetRef ref) {
-    // Initializing Insterstitail ads
-    AdManager.initInterstitailAds(ref);
     debugPrint('state rebuild');
 
     return Scaffold(
       resizeToAvoidBottomInset: false,
-      bottomNavigationBar: AdManager.isBannerEnbaled(ref) ? const BannerAdWidget() : null,
       body: SafeArea(
         bottom: true,
         top: false,

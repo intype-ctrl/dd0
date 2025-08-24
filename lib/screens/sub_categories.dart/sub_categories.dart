@@ -1,7 +1,6 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:icons_plus/icons_plus.dart';
-import 'package:news_app/ads/inline_ads.dart';
 import 'package:news_app/components/article_tiles/article_tile1.dart';
 import 'package:news_app/screens/search/search_view.dart';
 import 'package:news_app/screens/sub_categories.dart/sub_categories_provider.dart';
@@ -117,7 +116,6 @@ class __CategoryArticlesState extends ConsumerState<_CategoryArticles> {
                     itemBuilder: (BuildContext context, int index) {
                       return Column(
                         children: [
-                          InlineAds(ref: ref, index: index),
                           ArticleTile(article: articles[index]),
                         ],
                       );

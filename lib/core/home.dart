@@ -1,7 +1,6 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:news_app/providers/app_settings_provider.dart';
-import '../ads/ad_manager.dart';
 import '../mixins/search_mixin.dart';
 import '../providers/user_data_provider.dart';
 import '../screens/home/home_view.dart';
@@ -34,7 +33,6 @@ class _HomeState extends ConsumerState<Home> {
   @override
   void initState() {
     _initData();
-    AdManager.initAds(ref);
     _checkUserAccess();
     super.initState();
   }

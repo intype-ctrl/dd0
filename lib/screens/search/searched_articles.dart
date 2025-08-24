@@ -1,7 +1,6 @@
 import 'package:easy_localization/easy_localization.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
-import 'package:news_app/ads/inline_ads.dart';
 import 'package:news_app/components/article_tiles/article_tile3.dart';
 import 'package:news_app/configs/app_assets.dart';
 import 'package:news_app/utils/empty_animation.dart';
@@ -30,7 +29,6 @@ class SearchedArticles extends ConsumerWidget {
             final Article article = articles[index];
             return Column(
               children: [
-                InlineAds(ref: ref, index: index),
                 ArticleTile3(article: article, isReplace: false,),
               ],
             );

@@ -102,4 +102,17 @@ flutter:
     - assets/images/
     - assets/animation_files/
     - assets/translations/
-
+    - assets/images/a1.png
+    - assets/images/s1.png
+    - assets/images/s2.png
+    - assets/images/s3.png
+    - assets/images/s4.png
+    - assets/images/s5.png
+    - assets/images/s6.png
+    - assets/images/company.png
+    - assets/icons/home.svg
+    - assets/icons/home-active.svg
+    - assets/icons/search.svg
+    - assets/icons/search-active.svg
+    - assets/icons/donate.svg
+    - assets/icons/donate-active.svg

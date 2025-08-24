@@ -2,9 +2,6 @@ import 'package:cloud_firestore/cloud_firestore.dart';
 import 'package:easy_localization/easy_localization.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
-import 'package:news_app/ads/ad_manager.dart';
-import 'package:news_app/ads/banner_ad.dart';
-import 'package:news_app/ads/inline_ads.dart';
 import 'package:news_app/configs/app_assets.dart';
 import 'package:news_app/utils/empty_animation.dart';
 import '../../components/article_tiles/article_tile1.dart';
@@ -122,7 +119,6 @@ class _AllArticlesViewState extends ConsumerState<AllArticlesView> {
   Widget build(BuildContext context) {
     return Scaffold(
       backgroundColor: Theme.of(context).canvasColor,
-      bottomNavigationBar: AdManager.isBannerEnbaled(ref) ? const BannerAdWidget() : null,
       body: RefreshIndicator(
         onRefresh: () async => _onRefresh(),
         child: CustomScrollView(
@@ -171,7 +167,6 @@ class _AllArticlesViewState extends ConsumerState<AllArticlesView> {
                                   final Article article = _articles[index];
                                   return Column(
                                     children: [
-                                      InlineAds(ref: ref, index: index),
                                       ArticleTile(article: article),
                                     ],
                                   );

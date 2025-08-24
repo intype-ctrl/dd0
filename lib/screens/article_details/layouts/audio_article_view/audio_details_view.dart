@@ -5,8 +5,6 @@ import 'package:news_app/models/article.dart';
 import 'package:news_app/screens/article_details/post_share_button.dart';
 import 'package:news_app/screens/article_details/related_articles.dart';
 import 'package:news_app/utils/cache_image_filter.dart';
-import '../../../../ads/ad_manager.dart';
-import '../../../../ads/banner_ad.dart';
 import '../../../../components/html_body.dart';
 import '../../../../services/app_service.dart';
 import '../../post_category.dart';
@@ -30,11 +28,9 @@ class AudioDetailsView extends ConsumerWidget {
 
   @override
   Widget build(BuildContext context, WidgetRef ref) {
-    AdManager.initInterstitailAds(ref);
 
     return Scaffold(
       resizeToAvoidBottomInset: false,
-      bottomNavigationBar: AdManager.isBannerEnbaled(ref) ? const BannerAdWidget() : null,
       body: CustomScrollView(
         slivers: [
           SliverAppBar(

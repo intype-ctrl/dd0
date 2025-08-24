@@ -2,7 +2,6 @@ import 'package:easy_localization/easy_localization.dart';
 import 'package:feather_icons/feather_icons.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
-import 'package:news_app/ads/inline_ads.dart';
 import 'package:news_app/components/article_tiles/article_tile5.dart';
 import 'package:news_app/configs/app_assets.dart';
 import 'package:news_app/models/article.dart';
@@ -123,7 +122,6 @@ class _PodcastTabState extends ConsumerState<PodcastTab> with AutomaticKeepAlive
                             final Article article = articles[index];
                             return Column(
                               children: [
-                                InlineAds(ref: ref, index: index),
                                 ArticleTile5(article: article),
                               ],
                             );

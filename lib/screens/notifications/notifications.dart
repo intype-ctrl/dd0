@@ -18,7 +18,7 @@ class Notifications extends StatelessWidget {
     final notificationList = Hive.box(notificationTag);
     return Scaffold(
       appBar: AppBar(
-        title: const Text('notifications').tr(),
+        title: const Text('알림').tr(),
         titleTextStyle: Theme.of(context).textTheme.titleLarge?.copyWith(fontWeight: FontWeight.w600),
         leading: IconButton(onPressed: () => Navigator.pop(context), icon: const Icon(FeatherIcons.chevronLeft)),
         actions: [

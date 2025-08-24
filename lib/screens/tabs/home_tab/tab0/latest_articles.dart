@@ -1,7 +1,6 @@
 import 'package:easy_localization/easy_localization.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
-import 'package:news_app/ads/inline_ads.dart';
 import 'package:news_app/components/article_tiles/article_tile1.dart';
 import 'package:news_app/providers/latest_articles_provider.dart';
 import '../../../../models/article.dart';
@@ -72,7 +71,6 @@ class _LattestArticlesState extends ConsumerState<LattestArticles> {
                   final Article article = articles[index];
                   return Column(
                     children: [
-                      InlineAds(ref: ref, index: index),
                       ArticleTile(article: article),
                     ],
                   );

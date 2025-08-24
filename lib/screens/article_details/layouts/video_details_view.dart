@@ -5,8 +5,6 @@ import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:news_app/models/article.dart';
 import 'package:news_app/screens/article_details/author_info.dart';
 import 'package:news_app/screens/article_details/post_share_button.dart';
-import '../../../ads/ad_manager.dart';
-import '../../../ads/banner_ad.dart';
 import '../../../components/html_body.dart';
 import '../../../components/video_player_widget.dart';
 import '../../../services/app_service.dart';
@@ -28,7 +26,6 @@ class VideoDetailsView extends ConsumerWidget {
 
   @override
   Widget build(BuildContext context, WidgetRef ref) {
-    AdManager.initInterstitailAds(ref);
 
     return Scaffold(
       appBar: AppBar(
@@ -40,7 +37,6 @@ class VideoDetailsView extends ConsumerWidget {
         ),
       ),
       resizeToAvoidBottomInset: false,
-      bottomNavigationBar: AdManager.isBannerEnbaled(ref) ? const BannerAdWidget() : null,
       body: Column(
         mainAxisAlignment: MainAxisAlignment.start,
         children: [
