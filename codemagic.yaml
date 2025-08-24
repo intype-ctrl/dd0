@@ -1,46 +1,38 @@
 workflows:
-  ios_release_testflight:
-    name: iOS Release (Internal Test)
-    instance_type: mac_mini_m1
-
-    # (권장) App Store Connect 통합 키 이름 지정
-    integrations:
-      app_store_connect: gdn0   # 팀 Integrations에 등록한 키 이름
-
+  ios-app-store-build:
+    name: iOS App Store Build
     environment:
-      flutter: stable
       xcode: latest
-
-      # ✅ ios_signing은 environment 안쪽에!
-      ios_signing:
-        distribution_type: app_store        # ← 언더스코어
-        bundle_identifier: com.ver1.gdn0    # ← 직접 명시 (변수 참조도 가능)
-
-      vars:
-        BUNDLE_ID: com.ver1.gdn0
-        TEAM_ID: 6FD7Y7A32X
       groups:
-        - appstore_credentials
-
+        - app_store_credentials
+      vars:
+        BUNDLE_ID: "com.ver1.gdn0"
+      XCODE_WORKSPACE: "Runner.xcworkspace"
+      XCODE_SCHEME: "Runner"   # ← 여기 이름이 실제 스킴과 같아야 함
     scripts:
-      - name: Prepare Flutter & CocoaPods
-        script: |
-          flutter clean
-          flutter pub get
-          cd ios
-          pod install --repo-update
-          cd ..
-
-      - name: Build IPA (Release)
-        script: |
-          flutter build ipa --release
-
+      - name: Set up signing
+        script: | 
+          keychain initialize
+          # Decode and install certificate
+          echo $CM_CERTIFICATE | base64 --decode > /tmp/certificate.p12
+          keychain add-certificates --certificate /tmp/certificate.p12 --certificate-password $CERTIFICATE_PASSWORD
+          # Decode and install provisioning profile
+          PROFILES_DIR="$HOME/Library/MobileDevice/Provisioning Profiles"
+          mkdir -p "$PROFILES_DIR"
+          echo $CM_PROVISIONING_PROFILE | base64 --decode > "$PROFILES_DIR/$(uuidgen).mobileprovision"
+      - name: Set up code signing settings
+        script: | 
+          xcode-project use-profiles
+      - name: Build ipa for App Store
+        script: | 
+          xcode-project build-ipa --project "$XCODE_PROJECT" --scheme "$XCODE_SCHEME"
     artifacts:
       - build/ios/ipa/*.ipa
-
+      - $HOME/Library/Developer/Xcode/DerivedData/**/Build/**/*.app
+      - $HOME/Library/Developer/Xcode/DerivedData/**/Build/**/*.dSYM
+      - /tmp/xcodebuild_logs/*.log 
     publishing:
       app_store_connect:
         api_key: $APP_STORE_CONNECT_PRIVATE_KEY
         key_id: $APP_STORE_CONNECT_KEY_IDENTIFIER
         issuer_id: $APP_STORE_CONNECT_ISSUER_ID
-        submit_to_testflight: true
