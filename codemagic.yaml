@@ -1,47 +1,32 @@
 workflows:
-  ios-app-store-build:
-    name: iOS App Store Build
+  ios-auto:
     environment:
       xcode: latest
       groups:
-        - app_store_credentials
+        - app_store_credentials   # 여기에 APP_STORE_CONNECT_* 3종 넣기
       vars:
         BUNDLE_ID: "com.ver1.gdn0"
-        XCODE_SCHEME: "Runner"              # 실제 스킴명(대부분 Runner)
         XCODE_WORKSPACE: "Runner.xcworkspace"
-        # XCODE_PROJECT: "Runner.xcodeproj"  # 워크스페이스가 아닌 경우에만 사용
+        XCODE_SCHEME: "Runner"
     scripts:
-      - name: Set up signing
+      - name: Auto sign (App Store)
         script: |
-          keychain initialize
-          # p12 설치
-          echo "$CM_CERTIFICATE" | base64 --decode > /tmp/certificate.p12
-          keychain add-certificates --certificate /tmp/certificate.p12 --certificate-password "$CERTIFICATE_PASSWORD"
-          # 프로비저닝 설치
-          PROFILES_DIR="$HOME/Library/MobileDevice/Provisioning Profiles"
-          mkdir -p "$PROFILES_DIR"
-          echo "$CM_PROVISIONING_PROFILE" | base64 --decode > "$PROFILES_DIR/$(uuidgen).mobileprovision"
-
-      - name: Set up code signing settings (manual)
-        script: |
-          # 워크스페이스 + 스킴을 명시해서 수동서명 매핑
+          app-store-connect fetch-signing-files \
+            --type IOS_APP_STORE \
+            --bundle-id "$BUNDLE_ID" \
+            --create
+          keychain add-certificates
           xcode-project use-profiles \
             --workspace "$XCODE_WORKSPACE" \
             --scheme "$XCODE_SCHEME"
-
-      - name: Build ipa for App Store
+      - name: Build IPA
         script: |
-          # 워크스페이스 빌드 (App Store 배포)
           xcode-project build-ipa \
             --workspace "$XCODE_WORKSPACE" \
             --scheme "$XCODE_SCHEME" \
             --export-method "app-store"
-
     artifacts:
       - build/ios/ipa/*.ipa
-      - $HOME/Library/Developer/Xcode/DerivedData/**/Build/**/*.app
-      - $HOME/Library/Developer/Xcode/DerivedData/**/Build/**/*.dSYM
-      - /tmp/xcodebuild_logs/*.log
     publishing:
       app_store_connect:
         api_key: $APP_STORE_CONNECT_PRIVATE_KEY
