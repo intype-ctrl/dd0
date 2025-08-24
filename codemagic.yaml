@@ -3,20 +3,24 @@ workflows:
     name: iOS Release (Internal Test)
     instance_type: mac_mini_m1
 
+    # (권장) App Store Connect 통합 키 이름 지정
+    integrations:
+      app_store_connect: park   # 팀 Integrations에 등록한 키 이름
+
     environment:
       flutter: stable
       xcode: latest
-      vars:
-        BUNDLE_ID: com.ver1.gdn0       # ← 너의 번들 ID
-        TEAM_ID: 6FD7Y7A32X          # ← Apple Developer Team ID (10자리)
-      groups:
-        - appstore_credentials         # 아래 ‘필수 시크릿’ 3개를 이 그룹에 저장
 
-    # ✅ 자동 코드서명: 인증서/프로파일(.p12/.mobileprovision) 업로드 불필요
-    ios_signing:
-      distribution_type: app-store
-      bundle_identifier: $BUNDLE_ID
-      team_id: $TEAM_ID               
+      # ✅ ios_signing은 environment 안쪽에!
+      ios_signing:
+        distribution_type: app_store        # ← 언더스코어
+        bundle_identifier: com.ver1.gdn0    # ← 직접 명시 (변수 참조도 가능)
+
+      vars:
+        BUNDLE_ID: com.ver1.gdn0
+        TEAM_ID: 6FD7Y7A32X
+      groups:
+        - appstore_credentials
 
     scripts:
       - name: Prepare Flutter & CocoaPods
@@ -36,7 +40,7 @@ workflows:
 
     publishing:
       app_store_connect:
-        api_key: $APP_STORE_CONNECT_PRIVATE_KEY     # .p8 “내용 전체” (멀티라인, secure)
-        key_id: $APP_STORE_CONNECT_KEY_IDENTIFIER   # Key ID
-        issuer_id: $APP_STORE_CONNECT_ISSUER_ID     # Issuer ID
-        submit_to_testflight: true                  # 내부 테스터만 쓰면 그룹 지정 X
+        api_key: $APP_STORE_CONNECT_PRIVATE_KEY
+        key_id: $APP_STORE_CONNECT_KEY_IDENTIFIER
+        issuer_id: $APP_STORE_CONNECT_ISSUER_ID
+        submit_to_testflight: true
