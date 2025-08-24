@@ -5,7 +5,7 @@ workflows:
 
     # (권장) App Store Connect 통합 키 이름 지정
     integrations:
-      app_store_connect: park2   # 팀 Integrations에 등록한 키 이름
+      app_store_connect: gdn0   # 팀 Integrations에 등록한 키 이름
 
     environment:
       flutter: stable
