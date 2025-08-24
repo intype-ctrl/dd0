@@ -1,0 +1,42 @@
+workflows:
+  ios_release_testflight:
+    name: iOS Release (Internal Test)
+    instance_type: mac_mini_m1
+
+    environment:
+      flutter: stable
+      xcode: latest
+      vars:
+        BUNDLE_ID: com.ver1.gdn0       # ← 너의 번들 ID
+        TEAM_ID: 6FD7Y7A32X          # ← Apple Developer Team ID (10자리)
+      groups:
+        - appstore_credentials         # 아래 ‘필수 시크릿’ 3개를 이 그룹에 저장
+
+    # ✅ 자동 코드서명: 인증서/프로파일(.p12/.mobileprovision) 업로드 불필요
+    ios_signing:
+      distribution_type: app-store
+      bundle_identifier: $BUNDLE_ID
+      team_id: $TEAM_ID               
+
+    scripts:
+      - name: Prepare Flutter & CocoaPods
+        script: |
+          flutter clean
+          flutter pub get
+          cd ios
+          pod install --repo-update
+          cd ..
+
+      - name: Build IPA (Release)
+        script: |
+          flutter build ipa --release
+
+    artifacts:
+      - build/ios/ipa/*.ipa
+
+    publishing:
+      app_store_connect:
+        api_key: "$APP_STORE_CONNECT_PRIVATE_KEY     # .p8 “내용 전체” (멀티라인, secure)
+        key_id: $APP_STORE_CONNECT_KEY_IDENTIFIER   # Key ID
+        issuer_id: $APP_STORE_CONNECT_ISSUER_ID     # Issuer ID
+        submit_to_testflight: true                  # 내부 테스터만 쓰면 그룹 지정 X

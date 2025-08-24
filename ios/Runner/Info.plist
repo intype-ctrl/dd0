@@ -7,7 +7,7 @@
 	<key>CFBundleDevelopmentRegion</key>
 	<string>$(DEVELOPMENT_LANGUAGE)</string>
 	<key>CFBundleDisplayName</key>
-	<string>NewsHour</string>
+	<string>굿피플</string>
 	<key>CFBundleExecutable</key>
 	<string>$(EXECUTABLE_NAME)</string>
 	<key>CFBundleIdentifier</key>
@@ -15,7 +15,7 @@
 	<key>CFBundleInfoDictionaryVersion</key>
 	<string>6.0</string>
 	<key>CFBundleName</key>
-	<string>NewsHour</string>
+	<string>굿피플</string>
 	<key>CFBundlePackageType</key>
 	<string>APPL</string>
 	<key>CFBundleShortVersionString</key>
@@ -69,7 +69,7 @@
 	<key>FacebookClientToken</key>
 	<string>CLIENT-TOKEN</string>
 	<key>665500d5d5c72ce7aaa614484456</key>
-	<string>NewsHour</string>
+	<string>굿피플</string>
 	<key>LSApplicationQueriesSchemes</key>
 	<array>
   	<string>fbapi</string>
@@ -89,7 +89,7 @@
 		<string>mailto</string>
 	</array>
 	<key>NSPhotoLibraryUsageDescription</key>
-	<string>This app needs this permission to access your chosen photo from your library and update your profile picture</string>
+	<string>test</string>
 	<key>CFBundleLocalizations</key>
 	<array>
 		<string>en</string>
