@@ -36,7 +36,7 @@ workflows:
 
     publishing:
       app_store_connect:
-        api_key: "$APP_STORE_CONNECT_PRIVATE_KEY     # .p8 “내용 전체” (멀티라인, secure)
+        api_key: $APP_STORE_CONNECT_PRIVATE_KEY     # .p8 “내용 전체” (멀티라인, secure)
         key_id: $APP_STORE_CONNECT_KEY_IDENTIFIER   # Key ID
         issuer_id: $APP_STORE_CONNECT_ISSUER_ID     # Issuer ID
         submit_to_testflight: true                  # 내부 테스터만 쓰면 그룹 지정 X
